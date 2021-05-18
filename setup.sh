@@ -73,6 +73,8 @@ echo REPLICATION_TOKEN $REPLICATION_TOKEN
 
 VAULT_TOKEN=$ROOT_TOKEN_2 vault write -address=http://127.0.0.1:8300 sys/replication/performance/secondary/enable token=$REPLICATION_TOKEN
 sleep 10
+docker-compose restart vault2_2
+docker-compose restart vault2_3
 
 CLUSTER2_TOKEN=$(vault write -address=http://127.0.0.1:8300 -format=json auth/userpass/login/user password=password | jq -r ".auth.client_token")
 echo CLUSTER2_TOKEN $CLUSTER2_TOKEN

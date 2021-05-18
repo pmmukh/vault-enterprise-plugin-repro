@@ -53,11 +53,41 @@ resource "vault_transit_secret_backend_key" "test" {
   type    = "aes256-gcm96"
 }
 
-resource "vault_generic_endpoint" "enable_replication" {
+resource "vault_generic_endpoint" "enable-replication" {
   path = "sys/replication/performance/primary/enable"
   disable_read = true
   disable_delete = true
   data_json = <<EOT
 {}
 EOT
+}
+
+resource "vault_generic_endpoint" "vault-auth-plugin-example-register" {
+  path = "sys/plugins/catalog/auth/vault-auth-plugin-example"
+  disable_read = true
+  disable_delete = true
+  data_json = <<EOT
+{
+  "sha256"  : "a53b3949ebab2105692fb0dddd45396cbb7400f47d40444242071b85c51406ba",
+  "command" : "vault-auth-plugin-example"
+}
+EOT
+}
+
+resource "vault_auth_backend" "vault-auth-plugin-example" {
+  type = "vault-auth-plugin-example"
+  depends_on = [
+    vault_generic_endpoint.vault-auth-plugin-example-register
+  ]
+  tune {
+    token_type = "default-batch"
+  }
+}
+
+resource "vault_audit" "standard" {
+  type = "file"
+
+  options = {
+    file_path = "/tmp/vault_audit.log"
+  }
 }

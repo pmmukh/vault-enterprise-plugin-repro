@@ -2,6 +2,6 @@
 
 while :
 do
-    vault login -address=http://127.0.0.1:8300 -method=userpass username=user password=password
+    vault write -address=http://127.0.0.1:8300 -format=json auth/vault-auth-plugin-example/login password=super-secret-password
     sleep 0.1
 done
