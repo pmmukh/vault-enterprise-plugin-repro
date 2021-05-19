@@ -79,3 +79,12 @@ docker-compose restart vault2_3
 CLUSTER2_TOKEN=$(vault write -address=http://127.0.0.1:8300 -format=json auth/userpass/login/user password=password | jq -r ".auth.client_token")
 echo CLUSTER2_TOKEN $CLUSTER2_TOKEN
 echo "Setup done"
+
+echo "In seperate terminal windows, launch secondary_login_loop_1.sh, secondary_login_loop_2.sh, secondary_login_loop_3.sh, primary_login_loop.sh"
+echo "You may also want to tail server logs by running docker-compose logs -f."
+echo "When that is done,"
+read -p "Press enter to tune the audit_non_hmac_response_keys for vault-auth-plugin-example plugin in namespaces"
+
+VAULT_TOKEN=$ROOT_TOKEN_1 vault auth tune -address=http://127.0.0.1:8200 -namespace=ns1 -audit-non-hmac-response-keys=error2 vault-auth-plugin-example/
+VAULT_TOKEN=$ROOT_TOKEN_1 vault auth tune -address=http://127.0.0.1:8200 -namespace=ns2 -audit-non-hmac-response-keys=error2 vault-auth-plugin-example/
+VAULT_TOKEN=$ROOT_TOKEN_1 vault auth tune -address=http://127.0.0.1:8200 -audit-non-hmac-response-keys=error2 vault-auth-plugin-example/
