@@ -22,3 +22,4 @@
 
 - Using standard Vault docker image (1.5.7+ent)
 - The vault-plugin sha256 can be found in step 14 of docker-compose build .
+- Errors don't occur on the primary node, or if namespaces are not used
