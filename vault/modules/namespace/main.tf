@@ -27,7 +27,7 @@ resource "vault_namespace" "namespace" {
 
 resource "vault_auth_backend" "vault-auth-plugin-example" {
   provider = vault.namespace
-  type = "vault-auth-plugin-example"
+  type     = "vault-auth-plugin-example"
   depends_on = [
     vault_namespace.namespace
   ]

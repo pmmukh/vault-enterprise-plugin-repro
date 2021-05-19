@@ -5,13 +5,13 @@ provider "vault" {
 }
 
 module "ns1" {
-  source        = "./modules/namespace/"
-  namespace     = "ns1"
-  dependencies  = [vault_generic_endpoint.vault-auth-plugin-example-register.id]
+  source       = "./modules/namespace/"
+  namespace    = "ns1"
+  dependencies = [vault_generic_endpoint.vault-auth-plugin-example-register.id]
   providers = {
     vault.namespace = vault.ns1
-    vault.root = vault
-    null       = null
+    vault.root      = vault
+    null            = null
   }
 }
 
@@ -22,12 +22,12 @@ provider "vault" {
 }
 
 module "ns2" {
-  source        = "./modules/namespace/"
-  namespace     = "ns2"
-  dependencies  = [vault_generic_endpoint.vault-auth-plugin-example-register.id]
+  source       = "./modules/namespace/"
+  namespace    = "ns2"
+  dependencies = [vault_generic_endpoint.vault-auth-plugin-example-register.id]
   providers = {
     vault.namespace = vault.ns2
-    vault.root = vault
-    null       = null
+    vault.root      = vault
+    null            = null
   }
 }
