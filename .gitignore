@@ -2,3 +2,4 @@ transit-vault/.terraform/**
 vault/.terraform/**
 vault_2/.terraform/**
 *.tfstate
+vault-auth-plugin-example-256sum

@@ -1,6 +1,7 @@
 #!/bin/bash
 
-docker-compose stop
+docker compose stop
+docker compose rm
 pushd ./transit-vault
 rm -rf .terraform/
 rm -rf terraform.tfstate
@@ -19,21 +20,31 @@ rm -rf terraform.tfstate
 rm -rf terraform.tfstate.backup
 popd
 
+pushd ./vault-auth-plugin-example 
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -tags netgo -ldflags '-w' -o vault-auth-plugin-example *.go
+popd
+
+sha256sum ./vault-auth-plugin-example/vault-auth-plugin-example | cut -d " " -f1 > vault-auth-plugin-example-256sum
+
+
+echo 'enter vault license'
+read VAULT_LICENSE
+export VAULT_LICENSE=$VAULT_LICENSE
 echo "Start docker-compose on vault_transit"
 
-docker-compose up --no-start
-docker-compose start vault_transit
+docker compose up --no-start
+docker compose start vault_transit
 pushd ./transit-vault
 terraform init
 terraform apply -auto-approve
 popd
 
 echo "Start docker-compose on vault cluster 1"
-docker-compose start statsd
-docker-compose start consul
-docker-compose start vault_1
-docker-compose start vault_2
-docker-compose start vault_3
+docker compose start statsd
+docker compose start consul
+docker compose start vault_1
+docker compose start vault_2
+docker compose start vault_3
 RESPONSE=$(
     vault operator init -address=http://127.0.0.1:8200 -recovery-shares=1 -recovery-threshold=1 -format=json)
 echo $RESPONSE
@@ -48,10 +59,10 @@ echo "Setup done"
 
 
 echo "Start docker-compose on vault cluster 2"
-docker-compose start consul2
-docker-compose start vault2_1
-docker-compose start vault2_2
-docker-compose start vault2_3
+docker compose start consul2
+docker compose start vault2_1
+docker compose start vault2_2
+docker compose start vault2_3
 RESPONSE=$(vault operator init -address=http://127.0.0.1:8300 -recovery-shares=1 -recovery-threshold=1 -format=json)
 echo $RESPONSE
 ROOT_TOKEN_2=$(echo $RESPONSE | jq -j .root_token)
@@ -73,8 +84,8 @@ echo REPLICATION_TOKEN $REPLICATION_TOKEN
 
 VAULT_TOKEN=$ROOT_TOKEN_2 vault write -address=http://127.0.0.1:8300 sys/replication/performance/secondary/enable token=$REPLICATION_TOKEN
 sleep 10
-docker-compose restart vault2_2
-docker-compose restart vault2_3
+docker compose restart vault2_2
+docker compose restart vault2_3
 
 CLUSTER2_TOKEN=$(vault write -address=http://127.0.0.1:8300 -format=json auth/userpass/login/user password=password | jq -r ".auth.client_token")
 echo CLUSTER2_TOKEN $CLUSTER2_TOKEN

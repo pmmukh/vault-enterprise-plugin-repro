@@ -1,65 +1,65 @@
 version: '3.7'
 services:
   vault_transit:
-    image: hashicorp/vault-enterprise:1.5.7_ent
+    image: hashicorp/vault-enterprise:1.9.0_ent
     ports:
       - "8202:8200"
     expose:
       - "8201"
     environment:
-      - VAULT_LOCAL_CONFIG={"storage":{"inmem":{}},"api_addr":"http://vault_transit:8200","cluster_addr":"http://vault_transit:8201"}
       - VAULT_UI=true
       - VAULT_DEV_ROOT_TOKEN_ID=root
-    cap_add:
-      - IPC_LOCK
+      - VAULT_LICENSE=${VAULT_LICENSE}
+    volumes:
+      - ./vault_transit.hcl:/vault/config/vault_transit.hcl
   vault_1:
-    image: sunghon/vault-enterprise
-    build:
-      context: ./vault-image/.
+    image: hashicorp/vault-enterprise:1.9.0_ent
     command: server
     ports:
       - "8200:8200"
     expose:
       - "8201"
     environment:
-      - VAULT_LOCAL_CONFIG={"storage":{"consul":{"address":"consul:8500"}},"listener":[{"tcp":{"address":"0.0.0.0:8200","tls_disable":"true"}}],"api_addr":"http://vault_1:8200","cluster_addr":"http://vault_1:8201","telemetry":[{"statsd_address":"statsd:8125"}],"seal":{"transit":{"address":"http://vault_transit:8200","disable_renewal":"false","key_name":"auto-unseal","mount_path":"transit","tls_skip_verify":"false","token":"root"}}, "plugin_directory":"/usr/local/bin/vault/"}
+      - VAULT_LOCAL_CONFIG={"api_addr":"http://vault_1:8200","cluster_addr":"http://vault_1:8201"}
       - VAULT_UI=true
-    cap_add:
-      - IPC_LOCK
+      - VAULT_LICENSE=${VAULT_LICENSE}
+    volumes:
+      - ${PWD}/vault-auth-plugin-example/vault-auth-plugin-example:/usr/local/bin/vault/vault-auth-plugin-example
+      - ${PWD}/vault_primary.hcl:/vault/config/vault_primary.hcl
     depends_on:
       - consul
       - vault_transit
   vault_2:
-    image: sunghon/vault-enterprise
-    build:
-      context: ./vault-image/.
+    image: hashicorp/vault-enterprise:1.9.0_ent
     command: server
     ports:
       - "8198:8200"
     expose:
       - "8201"
     environment:
-      - VAULT_LOCAL_CONFIG={"storage":{"consul":{"address":"consul:8500"}},"listener":[{"tcp":{"address":"0.0.0.0:8200","tls_disable":"true"}}],"api_addr":"http://vault_2:8200","cluster_addr":"http://vault_2:8201","telemetry":[{"statsd_address":"statsd:8125"}],"seal":{"transit":{"address":"http://vault_transit:8200","disable_renewal":"false","key_name":"auto-unseal","mount_path":"transit","tls_skip_verify":"false","token":"root"}}, "plugin_directory":"/usr/local/bin/vault/"}
+      - VAULT_LOCAL_CONFIG={"api_addr":"http://vault_2:8200","cluster_addr":"http://vault_2:8201"}
       - VAULT_UI=true
-    cap_add:
-      - IPC_LOCK
+      - VAULT_LICENSE=${VAULT_LICENSE}
+    volumes:
+      - ${PWD}/vault-auth-plugin-example/vault-auth-plugin-example:/usr/local/bin/vault/vault-auth-plugin-example
+      - ${PWD}/vault_primary.hcl:/vault/config/vault_primary.hcl
     depends_on:
       - consul
       - vault_1
   vault_3:
-    image: sunghon/vault-enterprise
-    build:
-      context: ./vault-image/.
+    image: hashicorp/vault-enterprise:1.9.0_ent
     command: server
     ports:
       - "8196:8200"
     expose:
       - "8201"
     environment:
-      - VAULT_LOCAL_CONFIG={"storage":{"consul":{"address":"consul:8500"}},"listener":[{"tcp":{"address":"0.0.0.0:8200","tls_disable":"true"}}],"api_addr":"http://vault_3:8200","cluster_addr":"http://vault_3:8201","telemetry":[{"statsd_address":"statsd:8125"}],"seal":{"transit":{"address":"http://vault_transit:8200","disable_renewal":"false","key_name":"auto-unseal","mount_path":"transit","tls_skip_verify":"false","token":"root"}}, "plugin_directory":"/usr/local/bin/vault/"}
+      - VAULT_LOCAL_CONFIG={"api_addr":"http://vault_3:8200","cluster_addr":"http://vault_3:8201"}
       - VAULT_UI=true
-    cap_add:
-      - IPC_LOCK
+      - VAULT_LICENSE=${VAULT_LICENSE}
+    volumes:
+      - ${PWD}/vault-auth-plugin-example/vault-auth-plugin-example:/usr/local/bin/vault/vault-auth-plugin-example
+      - ${PWD}/vault_primary.hcl:/vault/config/vault_primary.hcl
     depends_on:
       - consul
       - vault_2
@@ -68,53 +68,53 @@ services:
     environment:
       - CONSUL_LOCAL_CONFIG={"log_level":"INFO"}
   vault2_1:
-    image: sunghon/vault-enterprise
-    build:
-      context: ./vault-image/.
+    image: hashicorp/vault-enterprise:1.9.0_ent
     command: server
     ports:
       - "8300:8200"
     expose:
       - "8201"
     environment:
-      - VAULT_LOCAL_CONFIG={"storage":{"consul":{"address":"consul2:8500"}},"listener":[{"tcp":{"address":"0.0.0.0:8200","tls_disable":"true"}}],"api_addr":"http://vault2_1:8200","cluster_addr":"http://vault2_1:8201","telemetry":[{"statsd_address":"statsd:8125"}],"seal":{"transit":{"address":"http://vault_transit:8200","disable_renewal":"false","key_name":"auto-unseal","mount_path":"transit","tls_skip_verify":"false","token":"root"}}, "plugin_directory":"/usr/local/bin/vault/"}
+      - VAULT_LOCAL_CONFIG={"api_addr":"http://vault2_1:8200","cluster_addr":"http://vault2_1:8201"}
       - VAULT_UI=true
-    cap_add:
-      - IPC_LOCK
+      - VAULT_LICENSE=${VAULT_LICENSE}
+    volumes:
+      - ${PWD}/vault-auth-plugin-example/vault-auth-plugin-example:/usr/local/bin/vault/vault-auth-plugin-example
+      - ${PWD}/vault_pr.hcl:/vault/config/vault_pr.hcl
     depends_on:
       - consul2
       - vault_transit
   vault2_2:
-    image: sunghon/vault-enterprise
-    build:
-      context: ./vault-image/.
+    image: hashicorp/vault-enterprise:1.9.0_ent
     command: server
     ports:
       - "8298:8200"
     expose:
       - "8201"
+    volumes:
+      - ${PWD}/vault-auth-plugin-example/vault-auth-plugin-example:/usr/local/bin/vault/vault-auth-plugin-example
+      - ${PWD}/vault_pr.hcl:/vault/config/vault_pr.hcl
     environment:
-      - VAULT_LOCAL_CONFIG={"storage":{"consul":{"address":"consul2:8500"}},"listener":[{"tcp":{"address":"0.0.0.0:8200","tls_disable":"true"}}],"api_addr":"http://vault2_2:8200","cluster_addr":"http://vault2_2:8201","telemetry":[{"statsd_address":"statsd:8125"}],"seal":{"transit":{"address":"http://vault_transit:8200","disable_renewal":"false","key_name":"auto-unseal","mount_path":"transit","tls_skip_verify":"false","token":"root"}}, "plugin_directory":"/usr/local/bin/vault/"}
+      - VAULT_LOCAL_CONFIG={"api_addr":"http://vault2_2:8200","cluster_addr":"http://vault2_2:8201"}
       - VAULT_UI=true
-    cap_add:
-      - IPC_LOCK
+      - VAULT_LICENSE=${VAULT_LICENSE}
     depends_on:
       - consul2
       - vault2_1
   vault2_3:
-    image: sunghon/vault-enterprise
-    build:
-      context: ./vault-image/.
+    image: hashicorp/vault-enterprise:1.9.0_ent
     command: server
     ports:
       - "8296:8200"
     expose:
       - "8201"
+    volumes:
+      - ${PWD}/vault-auth-plugin-example/vault-auth-plugin-example:/usr/local/bin/vault/vault-auth-plugin-example
+      - ${PWD}/vault_pr.hcl:/vault/config/vault_pr.hcl
     environment:
-      - VAULT_LOCAL_CONFIG={"storage":{"consul":{"address":"consul2:8500"}},"listener":[{"tcp":{"address":"0.0.0.0:8200","tls_disable":"true"}}],"api_addr":"http://vault2_3:8200","cluster_addr":"http://vault2_3:8201","telemetry":[{"statsd_address":"statsd:8125"}],"seal":{"transit":{"address":"http://vault_transit:8200","disable_renewal":"false","key_name":"auto-unseal","mount_path":"transit","tls_skip_verify":"false","token":"root"}}, "plugin_directory":"/usr/local/bin/vault/"}
+      - VAULT_LOCAL_CONFIG={"api_addr":"http://vault2_3:8200","cluster_addr":"http://vault2_3:8201"}
       - VAULT_UI=true
-    cap_add:
-      - IPC_LOCK
+      - VAULT_LICENSE=${VAULT_LICENSE}
     depends_on:
       - consul2
       - vault2_2

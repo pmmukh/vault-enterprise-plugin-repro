@@ -1,6 +1,15 @@
 terraform {
 }
 
+locals {
+  plugin_sha256=trimspace(file("${path.module}/../vault-auth-plugin-example-256sum"))
+
+  plugin = {
+    command = "vault-auth-plugin-example"
+    sha256 = local.plugin_sha256
+  }
+}
+
 provider "vault" {
   address = "http://127.0.0.1:8200"
 }
@@ -69,12 +78,7 @@ resource "vault_generic_endpoint" "vault-auth-plugin-example-register" {
   path           = "sys/plugins/catalog/auth/vault-auth-plugin-example"
   disable_read   = true
   disable_delete = true
-  data_json      = <<EOT
-{
-  "sha256"  : "a53b3949ebab2105692fb0dddd45396cbb7400f47d40444242071b85c51406ba",
-  "command" : "vault-auth-plugin-example"
-}
-EOT
+  data_json      = jsonencode(local.plugin)
 }
 
 resource "vault_auth_backend" "vault-auth-plugin-example" {
