@@ -1,6 +1,7 @@
 # How to run
 
 1.  Run setup.sh
+1.  When it prompts, enter a valid Vault Enterprise license.
 1.  When it prompts, run secondary_login_loop.sh, secondary_login_loop_1.sh, secondary_login_loop_2.sh
 1.  Press enter to let tune plugin
 1.  Observe the login loops no longer succeed, with message "Error writing data to auth/vault-auth-plugin-example/login: context deadline exceeded"
@@ -20,6 +21,5 @@
 
 # Other notes
 
-- Using standard Vault docker image (1.5.7+ent)
-- The vault-plugin sha256 can be found in step 14 of docker-compose build .
+- Using standard Vault docker image (1.9.0+ent)
 - Errors don't occur on the primary node, or if namespaces are not used
