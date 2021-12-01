@@ -2,11 +2,11 @@ terraform {
 }
 
 locals {
-  plugin_sha256=trimspace(file("${path.module}/../vault-auth-plugin-example-256sum"))
+  plugin_sha256 = trimspace(file("${path.module}/../vault-auth-plugin-example-256sum"))
 
   plugin = {
     command = "vault-auth-plugin-example"
-    sha256 = local.plugin_sha256
+    sha256  = local.plugin_sha256
   }
 }
 
