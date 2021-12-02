@@ -12,6 +12,7 @@ locals {
 
 provider "vault" {
   address = "http://127.0.0.1:8200"
+  token   = var.token
 }
 
 provider "null" {
@@ -65,17 +66,20 @@ resource "vault_transit_secret_backend_key" "test" {
   type    = "aes256-gcm96"
 }
 
-resource "vault_generic_endpoint" "enable-replication" {
-  path           = "sys/replication/performance/primary/enable"
-  disable_read   = true
-  disable_delete = true
-  data_json      = <<EOT
-{}
-EOT
-}
+# resource "vault_generic_endpoint" "enable-replication" {
+#   path           = "sys/replication/performance/primary/enable"
+#   disable_read   = true
+#   disable_delete = true
+#   data_json      = <<EOT
+# {}
+# EOT
+# }
 
 resource "vault_generic_endpoint" "vault-auth-plugin-example-register" {
   path           = "sys/plugins/catalog/auth/vault-auth-plugin-example"
+  depends_on = [
+    vault_auth_backend.userpass,vault_mount.transit,vault_policy.user
+  ]
   disable_read   = true
   disable_delete = true
   data_json      = jsonencode(local.plugin)
