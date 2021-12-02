@@ -5,11 +5,20 @@ read VAULT_LICENSE_PATH
 export VAULT_LICENSE=$(cat $VAULT_LICENSE_PATH)
 
 echo ""
+echo "Cleanup env vars"
+echo ""
+rm -rf ~/.vault-token
+export VAULT_ADDR=
+export VAULT_NAMESPACE=
+echo ""
+echo "done"
+echo ""
+
+echo ""
 echo "Clean up previous runs"
 echo ""
 
-docker compose stop
-docker compose rm --force
+docker compose down
 pushd ./transit-vault
 rm -rf terraform.tfstate
 rm -rf terraform.tfstate.backup
