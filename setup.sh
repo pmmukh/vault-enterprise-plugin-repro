@@ -24,7 +24,7 @@ rm -rf terraform.tfstate
 rm -rf terraform.tfstate.backup
 popd
 
-pushd ./vault
+pushd ./vault_1
 rm -rf terraform.tfstate
 rm -rf terraform.tfstate.backup
 popd
@@ -57,6 +57,10 @@ echo ""
 
 docker compose up --no-start
 docker compose start vault_transit
+lsof -i :8202
+sleep 10s
+lsof -i :8202
+
 pushd ./transit-vault
 terraform init
 terraform apply -auto-approve
@@ -73,14 +77,13 @@ echo ""
 docker compose start statsd
 docker compose start consul
 docker compose start vault_1
-docker compose start vault_2
-docker compose start vault_3
+sleep 5s
 RESPONSE=$(
     vault operator init -address=http://127.0.0.1:8200 -recovery-shares=1 -recovery-threshold=1 -format=json)
 echo $RESPONSE
 ROOT_TOKEN_1=$(echo $RESPONSE | jq -j .root_token)
 echo ROOT_TOKEN_1 = $ROOT_TOKEN_1
-pushd ./vault
+pushd ./vault_1
 terraform init -var="token=$ROOT_TOKEN_1"
 terraform apply -auto-approve -var="token=$ROOT_TOKEN_1" -parallelism=1
 popd
@@ -95,8 +98,8 @@ echo ""
 
 docker compose start consul2
 docker compose start vault2_1
-docker compose start vault2_2
-docker compose start vault2_3
+sleep 5s
+
 RESPONSE=$(vault operator init -address=http://127.0.0.1:8300 -recovery-shares=1 -recovery-threshold=1 -format=json)
 echo $RESPONSE
 ROOT_TOKEN_2=$(echo $RESPONSE | jq -j .root_token)
@@ -125,8 +128,7 @@ echo REPLICATION_TOKEN $REPLICATION_TOKEN
 VAULT_TOKEN=$ROOT_TOKEN_2 vault write -address=http://127.0.0.1:8300 sys/replication/performance/secondary/enable token=$REPLICATION_TOKEN
 sleep 10
 docker compose restart vault2_1
-docker compose restart vault2_2
-docker compose restart vault2_3
+sleep 20s
 
 echo ""
 echo "done"
@@ -146,6 +148,7 @@ echo "You may also want to tail server logs by running docker-compose logs -f."
 echo "When that is done,"
 read -p "Press enter to tune the audit_non_hmac_response_keys for vault-auth-plugin-example plugin in namespaces"
 
-VAULT_TOKEN=$ROOT_TOKEN_1 vault auth tune -address=http://127.0.0.1:8200 -namespace=ns1 -audit-non-hmac-response-keys=error2 vault-auth-plugin-example/
-VAULT_TOKEN=$ROOT_TOKEN_1 vault auth tune -address=http://127.0.0.1:8200 -namespace=ns2 -audit-non-hmac-response-keys=error2 vault-auth-plugin-example/
-VAULT_TOKEN=$ROOT_TOKEN_1 vault auth tune -address=http://127.0.0.1:8200 -audit-non-hmac-response-keys=error2 vault-auth-plugin-example/
+VAULT_TOKEN=$ROOT_TOKEN_1 vault auth tune -address=http://127.0.0.1:8200 -namespace=ns1 -audit-non-hmac-response-keys=error3 vault-auth-plugin-example/
+VAULT_TOKEN=$ROOT_TOKEN_1 vault auth tune -address=http://127.0.0.1:8200 -audit-non-hmac-response-keys=error3 vault-auth-plugin-example/
+
+echo $(date -u) "Done tuning"

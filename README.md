@@ -1,11 +1,22 @@
 # How to run
 
+My changes on top of the original repro are a bit of a hot mess and some
+are unnecessary, but they work, and I'll clean it up later (probably).
+
+Prep Steps ( to load in the custom binary )
+
+1. Run XC_OSARCH=linux/amd64 make premdev on vault-ent local directory (with the branch vault-4494-testing)
+2. Do cp ./bin/vault ~/path-to-repo/vault-binary from vault-ent local directory
+3. Run docker build -t vault:my-tag . from this repo, to create/update the image used by compose.
+
+
 1.  Run setup.sh
-1.  When it prompts, enter a valid Vault Enterprise license.
-1.  When it prompts, run secondary_login_loop.sh, secondary_login_loop_1.sh, secondary_login_loop_2.sh
+1.  When it prompts, enter a valid Vault Enterprise license. (the binary has a license baked in, so random paths work here, its not reqd)
+1.  When it prompts, run secondary_login_loop.sh.
 1.  Press enter to let tune plugin
 1.  Observe the login loops no longer succeed, with message "Error writing data to auth/vault-auth-plugin-example/login: context deadline exceeded"
 1.  After a couple more minutes, the login loops succeed again.
+1. While not required cause setup.sh runs this at the top, if you want you can also do cleanup with cleanup.sh
 
 # Notes on setup
 

@@ -20,5 +20,6 @@ seal "transit" {
   token = "root"
 }
 
+log_level = "Debug"
 plugin_directory = "/usr/local/bin/vault/"
 disable_mlock = true
