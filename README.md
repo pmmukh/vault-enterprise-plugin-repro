@@ -9,6 +9,7 @@ are unnecessary, but they work, and I'll clean it up later (probably).
 2. Do cp ./bin/vault ~/path-to-repo/vault-binary from vault-ent local directory
 3. Run docker build -t vault:my-tag . from this repo, to create/update the image used by compose.
 4. Note that the terminal you run setup.sh and secondary_login_loop.sh in, should be able to use the vault cli
+5. Update the replace directive in the go.mod of the local plugin as needed to point to the local sdk of your vault-ent testing branch
 
 ## Testing Steps
 1.  Run setup.sh
@@ -23,9 +24,9 @@ are unnecessary, but they work, and I'll clean it up later (probably).
 
 - Docker-compose creates
 - a "auto-unseal" vault (1 instance running in memory storage)
-- 2 Vault clusters using Consul storage.   Each cluster has 3 instances that write to a single consul backend.   (vault_1, vault_2, vault_3 --> consul_1) (vault2_1, vault2_2, vault_3 --> consul_2)
+- 2 Vault clusters using Consul storage.   Each cluster has 1 instance that write to a single consul backend.   (vault_1 --> consul_1) (vault2_1 --> consul_2)
 - Each vault instance has the vault auth plugin sample "https://github.com/hashicorp/vault-auth-plugin-example".
-- We setup vault performance replication (primary is vault_1, vault_2, vault_3,  performance secondary is vault2_1, vault2_2, vault2_3)
+- We setup vault performance replication (primary is vault_1,  performance secondary is vault2_1)
 - Through terraform, we configure vault, it has 3 namespace, (root, ns1, ns2).  All namespace has vault-auth-plugin-example enabled
 - secondary_login_loop_\*.sh is endless loop to login into the plugin on the different performance secondary cluster instances on the different namespaces
 
